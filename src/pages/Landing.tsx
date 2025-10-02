@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Shield, TrendingUp, Users, Wallet, CheckCircle2, Star, Trophy, Clock } from "lucide-react";
+import { ArrowRight, Shield, TrendingUp, Users, Wallet, CheckCircle2, Star, Trophy, Clock, Copy, DollarSign, BarChart3, Lock, Headphones, Monitor, CreditCard, Bot } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const Landing = () => {
   const [stats, setStats] = useState({ users: 0, days: 0, invested: 0, paidOut: 0 });
+  const [cryptoPrices, setCryptoPrices] = useState<any[]>([]);
 
   useEffect(() => {
     // Animate counters
@@ -29,6 +30,26 @@ const Landing = () => {
     }, interval);
 
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Fetch live crypto prices from CoinGecko
+    const fetchPrices = async () => {
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether&order=market_cap_desc&per_page=3&page=1&sparkline=false&price_change_percentage=24h'
+        );
+        const data = await response.json();
+        setCryptoPrices(data);
+      } catch (error) {
+        console.error('Error fetching crypto prices:', error);
+      }
+    };
+
+    fetchPrices();
+    const interval = setInterval(fetchPrices, 30000); // Update every 30 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const plans = [
@@ -96,46 +117,96 @@ const Landing = () => {
         </div>
       </header>
 
+      {/* Live Price Ticker */}
+      <div className="bg-card border-y border-border py-4 overflow-hidden">
+        <div className="flex animate-scroll gap-8">
+          {cryptoPrices.concat(cryptoPrices).map((crypto, i) => (
+            <div key={i} className="flex items-center gap-2 whitespace-nowrap px-4">
+              <span className="font-semibold">{crypto.symbol?.toUpperCase()}/USD</span>
+              <span className="text-lg font-bold">{crypto.current_price?.toLocaleString()}</span>
+              <span className={crypto.price_change_percentage_24h >= 0 ? 'text-secondary' : 'text-destructive'}>
+                {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
+                {crypto.price_change_24h?.toFixed(2)} ({crypto.price_change_percentage_24h?.toFixed(2)}%)
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            <Badge className="mb-6 bg-primary/20 text-primary border-primary/30">
-              🎉 Get FREE $100 on $500 deposit
-            </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Trade Smarter,
-              <span className="gradient-gold bg-clip-text text-transparent"> Earn Faster</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Access over 15,000 products across 7 asset classes. Crypto, Forex, Stocks, and more. Start with as little as $500 and watch your profits grow.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
-                <Button size="lg" className="gradient-gold text-lg px-8 animate-pulse-glow">
-                  Get Started <ArrowRight className="ml-2" />
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                View Demo
-              </Button>
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="animate-fade-in">
+              <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                Crypto, Forex and Trading
+              </h1>
+              <div className="bg-card/80 backdrop-blur-sm p-8 rounded-lg border border-border">
+                <Badge className="mb-4 bg-accent/20 text-accent border-accent/30">
+                  $3 GET FREE
+                </Badge>
+                <h2 className="text-2xl font-bold mb-4">AI TRADING BOT AND CHATGPT</h2>
+                <p className="text-muted-foreground mb-6">
+                  ChatGPT was used to build an AI trading bot that helps each trader to trade formidable profit. They can 
+                  do an even better job of trading than humans. They can also process and interpret data faster than any 
+                  human could, saving users a lot of time and preventing them from costly mistakes. Our AI-powered 
+                  trading bots guarantee profits.
+                </p>
+                <Link to="/auth">
+                  <Button size="lg" className="gradient-gold">
+                    Sign Up And Invest
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="aspect-square bg-gradient-to-br from-primary/30 to-accent/30 rounded-lg flex items-center justify-center backdrop-blur-sm border border-border">
+                <BarChart3 className="w-64 h-64 text-primary/50" />
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-4xl mx-auto">
+      {/* 1 Account 200+ Products */}
+      <section className="py-20 bg-gradient-to-br from-primary to-accent">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-primary-foreground">1 Account 200+ Products</h2>
+            <p className="text-xl text-primary-foreground/90 max-w-3xl mx-auto">
+              Diversify your portfolio with access to over 15,000 products across 7 asset classes. Trade CFDs on Forex, Futures, Indices, Metals, Energies and Shares.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {[
-              { label: "Active Users", value: stats.users.toLocaleString(), icon: Users },
-              { label: "Days in Work", value: stats.days.toLocaleString(), icon: Clock },
-              { label: "Total Invested", value: `$${(stats.invested / 1000000).toFixed(1)}M`, icon: Wallet },
-              { label: "Paid Out", value: `$${(stats.paidOut / 1000000).toFixed(1)}M`, icon: TrendingUp },
-            ].map((stat, i) => (
-              <Card key={i} className="text-center bg-card/50 border-border/50 backdrop-blur-sm animate-counter">
-                <CardContent className="pt-6">
-                  <stat.icon className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <div className="text-3xl font-bold gradient-gold bg-clip-text text-transparent">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+              { 
+                icon: DollarSign, 
+                title: "Crypto", 
+                desc: "Trade and Mine Bitcoin and Other Leading Crypto Currencies with Decentralized Finance"
+              },
+              { 
+                icon: Copy, 
+                title: "Copy", 
+                desc: "Copy trading allows you to directly copy the positions taken by another trader. You simply copy everything"
+              },
+              { 
+                icon: TrendingUp, 
+                title: "Forex", 
+                desc: "Trade currency pairs and be able to implement your own trading strategies with minimum slippage"
+              },
+              { 
+                icon: BarChart3, 
+                title: "Stocks", 
+                desc: "Stock trading is really easy. Navigate through your stocks and earnings"
+              },
+            ].map((item, i) => (
+              <Card key={i} className="bg-primary-foreground/10 border-primary-foreground/20 backdrop-blur-sm hover:bg-primary-foreground/20 transition-all">
+                <CardContent className="pt-8 text-center">
+                  <item.icon className="w-16 h-16 mx-auto mb-4 text-primary-foreground" />
+                  <h3 className="text-2xl font-bold mb-3 text-primary-foreground">{item.title}</h3>
+                  <p className="text-sm text-primary-foreground/80">{item.desc}</p>
                 </CardContent>
               </Card>
             ))}
@@ -190,25 +261,84 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Four Easy Steps */}
+      {/* Benefits Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Four Easy Steps to Success</h2>
-            <p className="text-muted-foreground text-lg">Start earning in minutes</p>
+            <h2 className="text-4xl font-bold mb-4">Benefits of Joining and Investing with Us</h2>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {steps.map((step, i) => (
-              <div key={i} className="text-center animate-slide-up" style={{ animationDelay: `${i * 100}ms` }}>
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <step.icon className="w-10 h-10 text-primary-foreground" />
-                </div>
-                <div className="text-primary font-bold text-lg mb-2">Step {i + 1}</div>
-                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground text-sm">{step.desc}</p>
-              </div>
+          <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto mb-20">
+            {[
+              { 
+                icon: Headphones, 
+                title: "24/7 Customer Support", 
+                desc: "With trained and experienced support staff, all your queries are just one click away from getting answered. Our support team provides 24/7 support and assistance to customers."
+              },
+              { 
+                icon: Monitor, 
+                title: "Seamless Experience", 
+                desc: "Earning has never been this easy. Whether you are making payments or making payouts or you are simply checking up on your investments, navigating the platform is seamless and easy."
+              },
+              { 
+                icon: Lock, 
+                title: "100% Secure Platform", 
+                desc: "Using state-of-the art servers, we have guarded our servers with high-end SSL technology and the latest DDoS Guard to protect against attacks."
+              },
+              { 
+                icon: CreditCard, 
+                title: "Multiple Payment Methods", 
+                desc: "With an array of payment methods provided by the platform, you get multiple options to make payments and receive payouts."
+              },
+            ].map((item, i) => (
+              <Card key={i} className="text-center hover:shadow-lg transition-all">
+                <CardContent className="pt-8">
+                  <item.icon className="w-16 h-16 mx-auto mb-4 text-primary" />
+                  <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </CardContent>
+              </Card>
             ))}
+          </div>
+
+          {/* Regulated Broker Section */}
+          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div>
+              <h2 className="text-3xl font-bold mb-6">Online trading with regulated Forex & CFD Broker</h2>
+              <p className="text-muted-foreground mb-4">
+                SimpleProfit offers forex and CFD contracts with honor winning exchanges, tight spreads, quality 
+                executions, and 24-hour live support. SimpleProfit is one of the most reliable investment broker and 
+                one of the leaders in the Forex showcase that joins dealers everywhere throughout the world.
+              </p>
+              <p className="text-muted-foreground mb-4">
+                SimpleProfit gives its customers an excellent administration and security, which is significant nowadays, 
+                especially when you are working with an online CFD broker. We offer multi-utilitarian Metatrader platform, 
+                instruction and a tremendous assortment of trading assets.
+              </p>
+              <p className="text-muted-foreground mb-6">
+                After you open an account in our organization, you can download the exchanging terminal, check the 
+                statements and open your trades. We offer stages of exchange for both for PC and cell phones. It will 
+                make your Forex trading as helpful as it can be.
+              </p>
+            </div>
+            <div>
+              <Card className="bg-card/50 border-2">
+                <CardContent className="pt-8 text-center">
+                  <Badge className="mb-4">FILE COPY</Badge>
+                  <Shield className="w-32 h-32 mx-auto mb-6 text-primary" />
+                  <h3 className="text-2xl font-bold mb-4">CERTIFICATE OF INCORPORATION</h3>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Certificate of Incorporation of a Private Limited Company
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    The Registrar of Companies for England and Wales, hereby certifies that SimpleProfit is this day 
+                    incorporated under the Companies Act 2006 as a private company, that the company is limited by 
+                    shared, and the situation on its registered office is in England and Wales.
+                  </p>
+                  <Button className="gradient-gold">View Certificate</Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>

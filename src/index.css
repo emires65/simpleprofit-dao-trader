@@ -99,6 +99,15 @@ All colors MUST be HSL.
       opacity: 1;
     }
   }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }
 
 @layer components {
@@ -120,5 +129,9 @@ All colors MUST be HSL.
 
   .animate-slide-up {
     animation: slide-up 0.6s ease-out;
+  }
+
+  .animate-scroll {
+    animation: scroll 20s linear infinite;
   }
 }
