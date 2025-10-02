@@ -1,79 +1,125 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { LayoutDashboard, Wallet, ArrowUpCircle, ArrowDownCircle, History, Settings, MessageSquare, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Card } from "@/components/ui/card";
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
+import { LayoutDashboard, User, HelpCircle, BarChart2, History, FileText, ArrowLeftRight, Repeat, Package, Users, ChevronDown, ArrowDownCircle, Gift, RefreshCw, Mail, Globe } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
-interface CryptoPrice {
-  id: string;
-  name: string;
-  symbol: string;
-  current_price: number;
-  price_change_percentage_24h: number;
+interface AccountStats {
+  deposited: number;
+  profit: number;
+  bonus: number;
+  refBonus: number;
+  packages: string;
+  ipAddress: string;
 }
 
 const Dashboard = () => {
   const location = useLocation();
-  const [prices, setPrices] = useState<CryptoPrice[]>([]);
-  const [balance] = useState(15420.50);
-  const [profit] = useState(2340.25);
-  const [profitPercent] = useState(17.9);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
+  const [priceChange, setPriceChange] = useState<number>(0);
+  
+  const [accountStats] = useState<AccountStats>({
+    deposited: 0.00,
+    profit: 0.00,
+    bonus: 20.00,
+    refBonus: 0.00,
+    packages: "Nil",
+    ipAddress: "---"
+  });
 
   useEffect(() => {
-    // Fetch live prices from CoinGecko
-    const fetchPrices = async () => {
+    // Fetch live Bitcoin price from CoinGecko
+    const fetchPrice = async () => {
       try {
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,binancecoin,cardano,solana&order=market_cap_desc'
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true'
         );
         const data = await response.json();
-        setPrices(data);
+        setCurrentPrice(data.bitcoin.usd);
+        setPriceChange(data.bitcoin.usd_24h_change);
       } catch (error) {
-        console.error('Error fetching prices:', error);
+        console.error('Error fetching price:', error);
       }
     };
 
-    fetchPrices();
-    const interval = setInterval(fetchPrices, 30000); // Update every 30 seconds
+    fetchPrice();
+    const interval = setInterval(fetchPrice, 30000);
+
+    // Load TradingView widget
+    if (chartContainerRef.current && !chartContainerRef.current.querySelector('script')) {
+      const script = document.createElement('script');
+      script.src = 'https://s3.tradingview.com/tv.js';
+      script.async = true;
+      script.onload = () => {
+        if ((window as any).TradingView) {
+          new (window as any).TradingView.widget({
+            container_id: 'tradingview_chart',
+            autosize: true,
+            symbol: 'COINBASE:BTCUSD',
+            interval: '60',
+            timezone: 'Etc/UTC',
+            theme: 'dark',
+            style: '1',
+            locale: 'en',
+            toolbar_bg: '#1e293b',
+            enable_publishing: false,
+            hide_side_toolbar: false,
+            allow_symbol_change: true,
+            studies: ['BB@tv-basicstudies'],
+            backgroundColor: '#1e293b',
+            gridColor: '#334155',
+            hide_top_toolbar: false,
+            hide_legend: false,
+            save_image: false,
+          });
+        }
+      };
+      document.head.appendChild(script);
+    }
 
     return () => clearInterval(interval);
   }, []);
 
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, url: "/dashboard" },
-    { title: "Deposit", icon: ArrowDownCircle, url: "/dashboard/deposit" },
-    { title: "Withdraw", icon: ArrowUpCircle, url: "/dashboard/withdraw" },
-    { title: "DAO Chat", icon: MessageSquare, url: "/dashboard/dao-chat" },
-    { title: "History", icon: History, url: "/dashboard/history" },
-    { title: "Settings", icon: Settings, url: "/dashboard/settings" },
+    { title: "Account", icon: User, url: "/dashboard/account", hasDropdown: true },
+    { title: "Support", icon: HelpCircle, url: "/dashboard/support" },
+    { title: "P/L record", icon: BarChart2, url: "/dashboard/pl-record" },
+    { title: "Trading History", icon: History, url: "/dashboard/trading-history" },
+    { title: "Transactions history", icon: FileText, url: "/dashboard/transactions" },
+    { title: "Deposit/Withdrawal", icon: ArrowLeftRight, url: "/dashboard/deposit-withdrawal", hasDropdown: true },
+    { title: "Subscription Trade", icon: Repeat, url: "/dashboard/subscription" },
+    { title: "Packages", icon: Package, url: "/dashboard/packages", hasDropdown: true },
+    { title: "Refer Users", icon: Users, url: "/dashboard/refer" },
   ];
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen w-full flex">
-        <Sidebar className="border-r border-border">
-          <div className="p-4 border-b border-border">
+      <div className="min-h-screen w-full flex bg-background">
+        <Sidebar className="border-r border-border/40">
+          <div className="p-4 border-b border-border/40">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-primary-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent/70 flex items-center justify-center">
+                <span className="text-lg font-bold text-white">SP</span>
               </div>
-              <span className="text-lg font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
+              <span className="text-lg font-bold text-foreground">SimpleProfit</span>
             </div>
           </div>
           
-          <SidebarContent>
+          <SidebarContent className="px-2 py-4">
             <SidebarGroup>
-              <SidebarGroupLabel>Menu</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {menuItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                        <Link to={item.url}>
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.title}</span>
+                        <Link to={item.url} className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <item.icon className="w-4 h-4" />
+                            <span className="text-sm">{item.title}</span>
+                          </div>
+                          {item.hasDropdown && <ChevronDown className="w-3 h-3 opacity-50" />}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -84,160 +130,101 @@ const Dashboard = () => {
           </SidebarContent>
         </Sidebar>
 
-        <main className="flex-1">
-          <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-            <div className="flex items-center justify-between p-4">
-              <SidebarTrigger />
-              <div className="flex items-center gap-4">
-                <Badge className="bg-secondary/20 text-secondary">Professional Plan</Badge>
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
-                    JD
-                  </div>
-                </Button>
-              </div>
-            </div>
-          </header>
-
+        <main className="flex-1 overflow-auto">
           <div className="p-6 space-y-6">
-            {/* Balance Cards */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="bg-gradient-to-br from-primary to-accent text-primary-foreground">
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium opacity-90">Total Balance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">${balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Profit</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold text-secondary">${profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                    <Badge className="bg-secondary/20 text-secondary">+{profitPercent}%</Badge>
+            {/* Account Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                    <ArrowDownCircle className="w-5 h-5 text-accent" />
                   </div>
-                </CardContent>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Deposited</p>
+                    <p className="text-lg font-bold">${accountStats.deposited.toFixed(2)}</p>
+                  </div>
+                </div>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Active Investments</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">3</div>
-                  <p className="text-sm text-muted-foreground mt-1">$12,500 invested</p>
-                </CardContent>
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center">
+                    <BarChart2 className="w-5 h-5 text-secondary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Profit</p>
+                    <p className="text-lg font-bold">${accountStats.profit.toFixed(2)}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-destructive/20 flex items-center justify-center">
+                    <Gift className="w-5 h-5 text-destructive" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Bonus</p>
+                    <p className="text-lg font-bold">${accountStats.bonus.toFixed(2)}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                    <RefreshCw className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Ref. Bonus</p>
+                    <p className="text-lg font-bold">${accountStats.refBonus.toFixed(2)}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Packages</p>
+                    <p className="text-lg font-bold">{accountStats.packages}</p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="bg-card/50 border-border/40 p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Ip Address</p>
+                    <p className="text-sm font-mono">{accountStats.ipAddress}</p>
+                  </div>
+                </div>
               </Card>
             </div>
 
-            {/* Live Prices */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                  Live Market Prices
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {prices.map((crypto) => (
-                    <div key={crypto.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary-foreground">{crypto.symbol.toUpperCase()}</span>
-                        </div>
-                        <div>
-                          <div className="font-semibold">{crypto.name}</div>
-                          <div className="text-sm text-muted-foreground">{crypto.symbol.toUpperCase()}</div>
-                        </div>
+            {/* Trading Chart */}
+            <Card className="bg-card/50 border-border/40">
+              <div className="p-4 border-b border-border/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-sm font-semibold">Bitcoin / U.S. Dollar • 1 • Coinbase</h3>
+                    {currentPrice > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold">${currentPrice.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                        <span className={`text-sm ${priceChange >= 0 ? 'text-secondary' : 'text-destructive'}`}>
+                          {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
+                        </span>
                       </div>
-                      <div className="text-right">
-                        <div className="font-bold">${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                        <div className={`text-sm flex items-center gap-1 justify-end ${crypto.price_change_percentage_24h > 0 ? 'text-secondary' : 'text-destructive'}`}>
-                          {crypto.price_change_percentage_24h > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                          {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <Card className="bg-card/50">
-                <CardHeader>
-                  <CardTitle className="text-lg">Quick Deposit</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Add funds to start trading</p>
-                  <Link to="/dashboard/deposit">
-                    <Button className="w-full gradient-gold">
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      Deposit Now
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/50">
-                <CardHeader>
-                  <CardTitle className="text-lg">DAO Insights</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Get live trading signals</p>
-                  <Link to="/dashboard/dao-chat">
-                    <Button className="w-full" variant="outline">
-                      <MessageSquare className="w-4 h-4 mr-2" />
-                      Open DAO Chat
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { type: 'deposit', amount: 5000, date: '2 hours ago', status: 'completed' },
-                    { type: 'trade', amount: 1250, date: '5 hours ago', status: 'completed' },
-                    { type: 'withdraw', amount: 800, date: '1 day ago', status: 'pending' },
-                  ].map((activity, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          activity.type === 'deposit' ? 'bg-secondary/20' : 
-                          activity.type === 'withdraw' ? 'bg-destructive/20' : 'bg-primary/20'
-                        }`}>
-                          {activity.type === 'deposit' && <ArrowDownCircle className="w-5 h-5 text-secondary" />}
-                          {activity.type === 'withdraw' && <ArrowUpCircle className="w-5 h-5 text-destructive" />}
-                          {activity.type === 'trade' && <TrendingUp className="w-5 h-5 text-primary" />}
-                        </div>
-                        <div>
-                          <div className="font-semibold capitalize">{activity.type}</div>
-                          <div className="text-sm text-muted-foreground">{activity.date}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold">${activity.amount}</div>
-                        <Badge variant={activity.status === 'completed' ? 'default' : 'secondary'} className="text-xs">
-                          {activity.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
+              </div>
+              <div id="tradingview_chart" ref={chartContainerRef} className="w-full h-[500px]" />
             </Card>
           </div>
         </main>
