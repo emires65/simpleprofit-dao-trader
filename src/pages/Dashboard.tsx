@@ -36,6 +36,31 @@ const Dashboard = () => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    if (!profile) return;
+
+    // Set up real-time subscription for profile updates
+    const channel = supabase
+      .channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${profile.balance !== undefined ? '' : ''}`, // Will be set after profile loads
+        },
+        (payload) => {
+          setProfile(payload.new as UserProfile);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.balance !== undefined]);
+
   const checkAuth = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -54,6 +79,24 @@ const Dashboard = () => {
 
       if (error) throw error;
       setProfile(profileData);
+
+      // Set up real-time subscription for profile updates
+      const channel = supabase
+        .channel('profile-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${session.user.id}`,
+          },
+          (payload) => {
+            setProfile(payload.new as UserProfile);
+          }
+        )
+        .subscribe();
+
     } catch (error: any) {
       console.error("Auth error:", error);
       toast({
