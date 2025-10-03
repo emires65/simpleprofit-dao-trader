@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Shield, TrendingUp, Users, Wallet, CheckCircle2, Star, Trophy, Clock, Copy, DollarSign, BarChart3, Lock, Headphones, Monitor, CreditCard, Bot } from "lucide-react";
 import { useState, useEffect } from "react";
 import cryptoTradingHero from "@/assets/crypto-trading-hero.png";
+import tradersProfit from "@/assets/traders-profit.jpg";
+import referralConversation from "@/assets/referral-conversation.jpg";
+import withdrawalProof from "@/assets/withdrawal-proof.jpg";
 
 const Landing = () => {
   const [stats, setStats] = useState({ users: 0, days: 0, invested: 0, paidOut: 0 });
@@ -96,11 +99,11 @@ const Landing = () => {
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">TradeFlow Pro</span>
+            <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/auth">
-              <Button className="bg-gold text-navy hover:bg-gold/90">
+              <Button className="gradient-gold">
                 Login / Sign Up
               </Button>
             </Link>
@@ -180,7 +183,7 @@ const Landing = () => {
       </section>
 
       {/* 1 Account 200+ Products */}
-      <section className="py-20 bg-gradient-to-br from-primary to-accent">
+      <section className="py-20 bg-gradient-to-br from-primary via-accent to-primary">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-primary-foreground">1 Account 200+ Products</h2>
@@ -353,6 +356,44 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Profit Showcase Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-accent/10">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div className="relative">
+              <img 
+                src={tradersProfit} 
+                alt="Happy traders celebrating their crypto profits"
+                className="rounded-2xl shadow-2xl w-full h-auto"
+              />
+            </div>
+            <div>
+              <Badge className="mb-4 bg-secondary/20 text-secondary">Real Results</Badge>
+              <h2 className="text-4xl font-bold mb-6">Join Thousands of Profitable Traders</h2>
+              <p className="text-muted-foreground text-lg mb-6">
+                Our traders are achieving consistent profits every month. With our AI-powered trading bot 
+                and expert support team, you'll have everything you need to succeed in crypto trading.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-card rounded-lg p-4 border border-border">
+                  <div className="text-3xl font-bold text-secondary mb-1">{stats.users.toLocaleString()}</div>
+                  <div className="text-sm text-muted-foreground">Active Traders</div>
+                </div>
+                <div className="bg-card rounded-lg p-4 border border-border">
+                  <div className="text-3xl font-bold text-secondary mb-1">98%</div>
+                  <div className="text-sm text-muted-foreground">Success Rate</div>
+                </div>
+              </div>
+              <Link to="/auth">
+                <Button size="lg" className="gradient-gold">
+                  Start Trading Now
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust Section */}
       <section className="py-20 bg-card/30">
         <div className="container mx-auto px-4">
@@ -378,7 +419,7 @@ const Landing = () => {
           </div>
 
           {/* Testimonials */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
             {[
               { name: "Sarah M.", role: "Professional Trader", text: "Best returns I've seen in years. The platform is intuitive and support is excellent.", rating: 5 },
               { name: "Michael R.", role: "Investor", text: "Started with the Starter plan, now on VIP. My portfolio has grown 300% in 6 months!", rating: 5 },
@@ -399,6 +440,116 @@ const Landing = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* Referral & Community Section */}
+          <div className="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+            <div>
+              <Badge className="mb-4 bg-accent/20 text-accent">Community Driven</Badge>
+              <h2 className="text-3xl font-bold mb-4">Traders Love Sharing SimpleProfit</h2>
+              <p className="text-muted-foreground text-lg mb-6">
+                Our community is growing rapidly as satisfied traders share their success stories. 
+                Join our referral program and earn bonuses when you introduce others to profitable trading.
+              </p>
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-secondary flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="font-semibold mb-1">Earn 10% Commission</div>
+                    <p className="text-sm text-muted-foreground">Get rewarded for every referral</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-secondary flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="font-semibold mb-1">Lifetime Earnings</div>
+                    <p className="text-sm text-muted-foreground">Earn from your referrals' trading activity</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-6 h-6 text-secondary flex-shrink-0 mt-1" />
+                  <div>
+                    <div className="font-semibold mb-1">Exclusive Rewards</div>
+                    <p className="text-sm text-muted-foreground">Unlock VIP benefits as you grow your network</p>
+                  </div>
+                </div>
+              </div>
+              <Link to="/auth">
+                <Button size="lg" className="gradient-gold">
+                  Join Referral Program
+                </Button>
+              </Link>
+            </div>
+            <div className="relative">
+              <img 
+                src={referralConversation} 
+                alt="Traders sharing SimpleProfit with friends"
+                className="rounded-2xl shadow-2xl w-full h-auto"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Withdrawal Proof Section */}
+      <section className="py-20 bg-gradient-to-br from-secondary/20 to-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-secondary/20 text-secondary">Verified Withdrawals</Badge>
+              <h2 className="text-4xl font-bold mb-4">Fast & Secure Withdrawals</h2>
+              <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
+                Get your profits instantly. We process withdrawals within 24 hours with no hidden fees.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-primary to-accent rounded-2xl opacity-20 blur-xl"></div>
+                <img 
+                  src={withdrawalProof} 
+                  alt="Successful withdrawal proof from SimpleProfit platform"
+                  className="relative rounded-2xl shadow-2xl w-full h-auto"
+                />
+              </div>
+              <div>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-6 h-6 text-secondary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">24-Hour Processing</h3>
+                      <p className="text-muted-foreground">All withdrawal requests are processed within 24 hours, guaranteed.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                      <Shield className="w-6 h-6 text-secondary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">Secure Transactions</h3>
+                      <p className="text-muted-foreground">Bank-level encryption protects every withdrawal transaction.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
+                      <DollarSign className="w-6 h-6 text-secondary" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">No Hidden Fees</h3>
+                      <p className="text-muted-foreground">What you earn is what you get. Zero hidden charges on withdrawals.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-8 p-6 bg-card rounded-lg border border-border">
+                  <div className="text-sm text-muted-foreground mb-2">Total Withdrawn This Month</div>
+                  <div className="text-3xl font-bold gradient-success bg-clip-text text-transparent">
+                    ${stats.paidOut.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
