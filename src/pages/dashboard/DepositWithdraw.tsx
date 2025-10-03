@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
@@ -187,24 +186,19 @@ export const DepositWithdraw = () => {
                 />
               </div>
 
-              <Button
-                onClick={() => setShowWalletDialog(true)}
-                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
-              >
-                Submit Withdrawal Request
-              </Button>
-
-              <AlertDialog open={showWalletDialog} onOpenChange={setShowWalletDialog}>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Connect Wallet</AlertDialogTitle>
-                    <AlertDialogDescription className="text-center space-y-4">
-                      <p className="text-lg font-semibold">Connect the correct wallet to complete payment</p>
-                      <p className="text-2xl font-bold text-green-600">Redirecting in {countdown} seconds...</p>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                </AlertDialogContent>
-              </AlertDialog>
+              {!showWalletDialog ? (
+                <Button
+                  onClick={() => setShowWalletDialog(true)}
+                  className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
+                >
+                  Submit Withdrawal Request
+                </Button>
+              ) : (
+                <div className="w-full p-8 bg-green-600 rounded-lg text-center space-y-4">
+                  <p className="text-xl font-bold text-white">Connect the correct wallet to complete payment</p>
+                  <p className="text-3xl font-bold text-white">Redirecting in {countdown} seconds...</p>
+                </div>
+              )}
 
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <p className="text-sm text-amber-400">
