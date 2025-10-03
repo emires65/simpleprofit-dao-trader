@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Shield, TrendingUp, Users, Wallet, CheckCircle2, Star, Trophy, Clock, Copy, DollarSign, BarChart3, Lock, Headphones, Monitor, CreditCard, Bot } from "lucide-react";
 import { useState, useEffect } from "react";
+import cryptoTradingHero from "@/assets/crypto-trading-hero.png";
 
 const Landing = () => {
   const [stats, setStats] = useState({ users: 0, days: 0, invested: 0, paidOut: 0 });
@@ -168,9 +169,11 @@ const Landing = () => {
               </div>
             </div>
             <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-primary/30 to-accent/30 rounded-lg flex items-center justify-center backdrop-blur-sm border border-border">
-                <BarChart3 className="w-64 h-64 text-primary/50" />
-              </div>
+              <img 
+                src={cryptoTradingHero} 
+                alt="Cryptocurrency trading with AI technology" 
+                className="w-full h-auto rounded-lg shadow-2xl"
+              />
             </div>
           </div>
         </div>
