@@ -95,8 +95,15 @@ const Landing = () => {
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
+            <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">TradeFlow Pro</span>
           </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/auth">
+              <Button className="bg-gold text-navy hover:bg-gold/90">
+                Login / Sign Up
+              </Button>
+            </Link>
+          </div>
           
           <nav className="hidden md:flex items-center gap-8">
             <Link to="/" className="text-foreground hover:text-primary transition-colors">Main</Link>

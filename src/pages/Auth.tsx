@@ -1,67 +1,121 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Mail, Lock, User, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Auth = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/dashboard");
+      }
+    });
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        navigate("/dashboard");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate auth
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Success!",
-        description: "You've been logged in.",
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-    }, 1000);
+
+      if (error) throw error;
+
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Invalid email or password",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate auth
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Welcome!",
-        description: "Your account has been created.",
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
       });
-    }, 1000);
+
+      if (error) throw error;
+
+      toast({
+        title: "Account created!",
+        description: "Welcome to TradeFlow Pro. Redirecting to dashboard...",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: error.message || "Could not create account",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-secondary/20" />
-      
-      <div className="w-full max-w-md relative z-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy via-primary to-navy p-4">
+      <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <TrendingUp className="w-7 h-7 text-primary-foreground" />
+          <div className="w-12 h-12 rounded-lg bg-gold flex items-center justify-center">
+            <TrendingUp className="w-7 h-7 text-navy" />
           </div>
-          <span className="text-3xl font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
+          <span className="text-3xl font-bold text-white">TradeFlow Pro</span>
         </Link>
 
-        <Card className="backdrop-blur-sm bg-card/50 border-border/50 animate-fade-in">
+        <Card className="border-gold/20">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription>Sign in to access your trading dashboard</CardDescription>
+            <CardTitle className="text-2xl">Welcome</CardTitle>
+            <CardDescription>Sign in or create an account to get started</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="register">Sign Up</TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
@@ -74,11 +128,14 @@ const Auth = () => {
                         id="login-email"
                         type="email"
                         placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
                     <div className="relative">
@@ -87,20 +144,20 @@ const Auth = () => {
                         id="login-password"
                         type="password"
                         placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" className="rounded border-border" />
-                      <span className="text-muted-foreground">Remember me</span>
-                    </label>
-                    <a href="#" className="text-primary hover:underline">Forgot password?</a>
-                  </div>
-                  <Button type="submit" className="w-full gradient-gold" disabled={isLoading}>
-                    {isLoading ? "Signing in..." : "Sign In"}
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-gold text-navy hover:bg-gold/90"
+                    disabled={loading}
+                  >
+                    {loading ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
               </TabsContent>
@@ -115,11 +172,14 @@ const Auth = () => {
                         id="register-name"
                         type="text"
                         placeholder="John Doe"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="register-email">Email</Label>
                     <div className="relative">
@@ -128,11 +188,14 @@ const Auth = () => {
                         id="register-email"
                         type="email"
                         placeholder="your@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="pl-10"
                         required
                       />
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>
                     <div className="relative">
@@ -141,31 +204,37 @@ const Auth = () => {
                         id="register-password"
                         type="password"
                         placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="pl-10"
                         required
+                        minLength={6}
                       />
                     </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    By registering, you agree to our{" "}
-                    <a href="#" className="text-primary hover:underline">Terms of Service</a> and{" "}
-                    <a href="#" className="text-primary hover:underline">Privacy Policy</a>
-                  </div>
-                  <Button type="submit" className="w-full gradient-gold" disabled={isLoading}>
-                    {isLoading ? "Creating account..." : "Create Account"}
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-gold text-navy hover:bg-gold/90"
+                    disabled={loading}
+                  >
+                    {loading ? "Creating account..." : "Create Account"}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
+
+            <div className="mt-6 text-center">
+              <Link
+                to="/"
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to home
+              </Link>
+            </div>
           </CardContent>
         </Card>
-
-        <div className="text-center mt-6">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" />
-            Back to home
-          </Link>
-        </div>
       </div>
     </div>
   );

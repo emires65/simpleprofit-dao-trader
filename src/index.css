@@ -8,54 +8,95 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 38 92% 50%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 142 71% 45%;
+    --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 38 92% 50%;
+    --accent: 45 100% 51%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 38 92% 50%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 45 100% 51%;
 
     --radius: 0.75rem;
 
-    /* Broker-specific design tokens */
+    /* Professional navy, gold, white theme */
+    --navy: 222 47% 11%;
+    --gold: 45 100% 51%;
     --gradient-primary: linear-gradient(135deg, hsl(222 47% 11%), hsl(217 33% 17%));
-    --gradient-gold: linear-gradient(135deg, hsl(38 92% 50%), hsl(45 93% 47%));
+    --gradient-gold: linear-gradient(135deg, hsl(45 100% 51%), hsl(43 96% 56%));
     --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(158 64% 52%));
     
-    --shadow-glow: 0 0 40px hsl(38 92% 50% / 0.15);
-    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.3);
+    --shadow-glow: 0 0 40px hsl(45 100% 51% / 0.15);
+    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.1);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 45 100% 51%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 45 100% 51%;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 100%;
+
+    --card: 217 33% 17%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 217 33% 17%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 45 100% 51%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 45 100% 51%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 45 100% 51%;
+
     --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 38 92% 50%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 45 100% 51%;
     --sidebar-primary-foreground: 222 47% 11%;
     --sidebar-accent: 217 33% 20%;
-    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 217 33% 25%;
-    --sidebar-ring: 38 92% 50%;
+    --sidebar-ring: 45 100% 51%;
   }
 }
 
