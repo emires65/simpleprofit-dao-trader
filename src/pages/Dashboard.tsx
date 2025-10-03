@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider } from "@/components/ui/sidebar";
-import { LayoutDashboard, User, HelpCircle, BarChart2, History, FileText, ArrowLeftRight, Repeat, Package, Users, LogOut, TrendingUp } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { LayoutDashboard, User, HelpCircle, BarChart2, History, FileText, ArrowLeftRight, Repeat, Package, Users, LogOut, TrendingUp, Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DashboardHome } from "./dashboard/DashboardHome";
 import { Account } from "./dashboard/Account";
 import { Support } from "./dashboard/Support";
@@ -29,8 +31,10 @@ const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -148,49 +152,97 @@ const Dashboard = () => {
     );
   }
 
+  const MenuContent = () => (
+    <>
+      <div className="p-4 border-b border-gold/20">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-lg bg-gold flex items-center justify-center">
+            <TrendingUp className="w-6 h-6 text-navy" />
+          </div>
+          <div>
+            <span className="text-lg font-bold">TradeFlow Pro</span>
+            <p className="text-xs text-muted-foreground">{profile?.full_name || "User"}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="px-2 py-4">
+        <div className="space-y-1">
+          {menuItems.map((item) => (
+            <Link
+              key={item.title}
+              to={item.url}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                location.pathname === item.url
+                  ? "bg-gold/10 text-gold"
+                  : "hover:bg-muted"
+              }`}
+            >
+              <item.icon className="w-4 h-4" />
+              <span className="text-sm">{item.title}</span>
+            </Link>
+          ))}
+          
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-sm">Logout</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen w-full bg-background">
+        <header className="sticky top-0 z-50 w-full border-b border-gold/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="flex h-14 items-center px-4">
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72 p-0">
+                <MenuContent />
+              </SheetContent>
+            </Sheet>
+            <div className="ml-4 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gold flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-navy" />
+              </div>
+              <span className="font-bold">TradeFlow Pro</span>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-4">
+          <Routes>
+            <Route index element={profile && <DashboardHome profile={profile} />} />
+            <Route path="account" element={<Account />} />
+            <Route path="support" element={<Support />} />
+            <Route path="pl-record" element={<PLRecord />} />
+            <Route path="trading-history" element={<TradingHistory />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="deposit-withdraw" element={<DepositWithdraw />} />
+            <Route path="subscription" element={<Subscription />} />
+            <Route path="packages" element={<Packages />} />
+            <Route path="refer" element={<ReferUsers />} />
+          </Routes>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full flex bg-background">
         <Sidebar className="border-r border-gold/20">
-          <div className="p-4 border-b border-gold/20">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-gold flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-navy" />
-              </div>
-              <div>
-                <span className="text-lg font-bold">TradeFlow Pro</span>
-                <p className="text-xs text-muted-foreground">{profile?.full_name || "User"}</p>
-              </div>
-            </div>
-          </div>
-          
-          <SidebarContent className="px-2 py-4">
-            <SidebarGroup>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {menuItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={location.pathname === item.url}>
-                        <Link to={item.url} className="flex items-center gap-3">
-                          <item.icon className="w-4 h-4" />
-                          <span className="text-sm">{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton onClick={handleLogout} className="text-red-500 hover:text-red-600">
-                      <div className="flex items-center gap-3">
-                        <LogOut className="w-4 h-4" />
-                        <span className="text-sm">Logout</span>
-                      </div>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
+          <MenuContent />
         </Sidebar>
 
         <main className="flex-1 overflow-auto">
