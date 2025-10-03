@@ -176,7 +176,7 @@ export const DepositWithdraw = () => {
               <Button
                 onClick={handleWithdraw}
                 disabled={loading}
-                className="w-full bg-gold text-navy hover:bg-gold/90"
+                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
               >
                 {loading ? "Processing..." : "Submit Withdrawal Request"}
               </Button>
