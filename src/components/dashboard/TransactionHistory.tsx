@@ -22,6 +22,26 @@ export const TransactionHistory = () => {
 
   useEffect(() => {
     fetchTransactions();
+
+    // Set up realtime subscription for instant updates
+    const channel = supabase
+      .channel('user-transactions')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'transactions'
+        },
+        () => {
+          fetchTransactions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchTransactions = async () => {
