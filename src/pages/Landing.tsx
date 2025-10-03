@@ -94,35 +94,35 @@ const Landing = () => {
     <div className="min-h-screen">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/auth">
-              <Button className="gradient-gold">
-                Login / Sign Up
-              </Button>
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <span className="text-2xl font-bold gradient-gold bg-clip-text text-transparent">SimpleProfit</span>
             </Link>
-          </div>
-          
-          <nav className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">Main</Link>
-            <Link to="/marketing" className="text-foreground hover:text-primary transition-colors">Marketing</Link>
-            <Link to="/calculator" className="text-foreground hover:text-primary transition-colors">Calculator</Link>
-            <Link to="/partners" className="text-foreground hover:text-primary transition-colors">Partners</Link>
-            <Link to="/statistics" className="text-foreground hover:text-primary transition-colors">Statistics</Link>
-          </nav>
+            
+            <nav className="hidden md:flex items-center gap-6">
+              <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
+                Main
+              </Link>
+              <Link to="/marketing" className="text-sm font-medium hover:text-primary transition-colors">
+                Marketing
+              </Link>
+              <Link to="/calculator" className="text-sm font-medium hover:text-primary transition-colors">
+                Calculator
+              </Link>
+              <Link to="/partners" className="text-sm font-medium hover:text-primary transition-colors">
+                Partners
+              </Link>
+              <Link to="/statistics" className="text-sm font-medium hover:text-primary transition-colors">
+                Statistics
+              </Link>
+            </nav>
 
-          <div className="flex items-center gap-3">
             <Link to="/auth">
-              <Button variant="ghost">Login</Button>
-            </Link>
-            <Link to="/auth">
-              <Button className="gradient-gold">Register</Button>
+              <Button className="gradient-gold">Get Started</Button>
             </Link>
           </div>
         </div>
