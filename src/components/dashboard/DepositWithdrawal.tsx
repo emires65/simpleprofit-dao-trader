@@ -10,6 +10,7 @@ import { ArrowDownLeft, ArrowUpRight } from "lucide-react";
 
 export const DepositWithdrawal = () => {
   const [amount, setAmount] = useState("");
+  const [walletAddress, setWalletAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -64,6 +65,15 @@ export const DepositWithdrawal = () => {
       return;
     }
 
+    if (!walletAddress || walletAddress.trim() === "") {
+      toast({
+        variant: "destructive",
+        title: "Address Required",
+        description: "Please enter your wallet address",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -74,7 +84,7 @@ export const DepositWithdrawal = () => {
         type: "withdrawal",
         amount: parseFloat(amount),
         status: "pending",
-        description: "Withdrawal request",
+        description: `Withdrawal request to ${walletAddress}`,
       });
 
       if (error) throw error;
@@ -84,6 +94,7 @@ export const DepositWithdrawal = () => {
         description: "Your withdrawal request has been submitted. Processing may take 24-48 hours.",
       });
       setAmount("");
+      setWalletAddress("");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -144,6 +155,16 @@ export const DepositWithdrawal = () => {
                 onChange={(e) => setAmount(e.target.value)}
                 min="0"
                 step="0.01"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="wallet-address">Wallet Address</Label>
+              <Input
+                id="wallet-address"
+                type="text"
+                placeholder="Enter your wallet address"
+                value={walletAddress}
+                onChange={(e) => setWalletAddress(e.target.value)}
               />
             </div>
             <Button
