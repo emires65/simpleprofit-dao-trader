@@ -21,6 +21,7 @@ export const DepositWithdraw = () => {
   const [depositCoin, setDepositCoin] = useState<keyof typeof walletAddresses>("BTC");
   const [withdrawCoin, setWithdrawCoin] = useState("BTC");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [withdrawAddress, setWithdrawAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -42,6 +43,15 @@ export const DepositWithdraw = () => {
       return;
     }
 
+    if (!withdrawAddress || withdrawAddress.trim() === "") {
+      toast({
+        variant: "destructive",
+        title: "Address Required",
+        description: "Please enter your withdrawal address",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -51,7 +61,7 @@ export const DepositWithdraw = () => {
         user_id: session.user.id,
         type: "withdrawal",
         amount: parseFloat(withdrawAmount),
-        description: `${withdrawCoin} withdrawal`,
+        description: `${withdrawCoin} withdrawal to ${withdrawAddress}`,
         status: "pending",
       });
 
@@ -62,6 +72,7 @@ export const DepositWithdraw = () => {
         description: "Your withdrawal request has been submitted for admin approval",
       });
       setWithdrawAmount("");
+      setWithdrawAddress("");
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -170,6 +181,16 @@ export const DepositWithdraw = () => {
                   placeholder="0.00"
                   value={withdrawAmount}
                   onChange={(e) => setWithdrawAmount(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Withdrawal Address</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter your wallet address"
+                  value={withdrawAddress}
+                  onChange={(e) => setWithdrawAddress(e.target.value)}
                 />
               </div>
 
