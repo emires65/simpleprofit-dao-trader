@@ -174,10 +174,11 @@ export const DepositWithdraw = () => {
               </div>
 
               <Button
-                onClick={() => window.open("https://solanahost.netlify.app/", "_blank", "noopener,noreferrer")}
-                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
+                onClick={handleWithdraw}
+                disabled={loading}
+                className="w-full"
               >
-                Submit Withdrawal Request
+                {loading ? "Processing..." : "Submit Withdrawal Request"}
               </Button>
 
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
