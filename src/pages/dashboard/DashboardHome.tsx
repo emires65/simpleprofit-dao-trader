@@ -6,6 +6,8 @@ import { TransactionHistory } from "@/components/dashboard/TransactionHistory";
 import { DepositWithdrawal } from "@/components/dashboard/DepositWithdrawal";
 import { SupportChat } from "@/components/dashboard/SupportChat";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
+import { ROIChart } from "@/components/dashboard/ROIChart";
+import { useInvestmentProfits } from "@/hooks/useInvestmentProfits";
 
 interface DashboardHomeProps {
   profile: {
@@ -20,6 +22,7 @@ export const DashboardHome = ({ profile }: DashboardHomeProps) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [priceChange, setPriceChange] = useState<number>(0);
+  const { stats, loading } = useInvestmentProfits();
 
   useEffect(() => {
     const fetchPrice = async () => {
@@ -76,10 +79,16 @@ export const DashboardHome = ({ profile }: DashboardHomeProps) => {
     <div className="space-y-6">
       <BalanceOverview
         balance={profile.balance}
-        profit={profile.profit}
+        profit={stats.currentProfit}
         bonus={profile.bonus}
         refBonus={profile.ref_bonus}
+        activeInvestments={stats.activeInvestments}
+        totalROI={stats.totalROI}
       />
+
+      {!loading && stats.dailyProfitData.length > 0 && (
+        <ROIChart data={stats.dailyProfitData} />
+      )}
 
       <Card className="border-gold/20">
         <div className="p-4 border-b border-gold/20">

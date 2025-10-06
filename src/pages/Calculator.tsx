@@ -21,7 +21,11 @@ const Calculator = () => {
   
   const plan = plans[parseInt(selectedPlan)];
   const investmentAmount = parseFloat(amount) || 0;
-  const dailyProfit = (investmentAmount * plan.dailyReturn) / 100;
+  
+  // Real-time profit calculation
+  const roiPercentage = plan.dailyReturn;
+  const expectedProfit = (investmentAmount * roiPercentage) / 100;
+  const dailyProfit = expectedProfit;
   const totalReturn = dailyProfit * plan.duration;
   const bonusAmount = (investmentAmount * plan.bonus) / 100;
   const totalProfit = totalReturn + bonusAmount;
@@ -85,15 +89,19 @@ const Calculator = () => {
 
               <div className="pt-4 space-y-3 border-t">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Daily Return Rate:</span>
-                  <span className="font-semibold">{plan.dailyReturn}%</span>
+                  <span className="text-muted-foreground">ROI Percentage:</span>
+                  <span className="font-semibold text-primary">{plan.dailyReturn}%</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Expected Profit:</span>
+                  <span className="font-semibold text-accent">${expectedProfit.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Duration:</span>
                   <span className="font-semibold">{plan.duration} days</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Bonus:</span>
+                  <span className="text-muted-foreground">Signup Bonus:</span>
                   <span className="font-semibold">{plan.bonus}%</span>
                 </div>
               </div>
