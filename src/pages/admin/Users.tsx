@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Edit, Ban, DollarSign } from "lucide-react";
+import { Search, Edit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,8 +15,9 @@ export default function AdminUsers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [editDialog, setEditDialog] = useState(false);
-  const [balanceDialog, setBalanceDialog] = useState(false);
   const [newBalance, setNewBalance] = useState("");
+  const [newProfit, setNewProfit] = useState("");
+  const [newBonus, setNewBonus] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -37,34 +38,15 @@ export default function AdminUsers() {
     setFilteredUsers(data || []);
   };
 
-  const handleUpdateBalance = async () => {
-    if (!selectedUser || !newBalance) return;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ balance: Number(newBalance) })
-      .eq('id', selectedUser.id);
-
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
-    }
-
-    // Log action
-    const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from('admin_logs').insert({
-      admin_id: user?.id,
-      action: 'update_user_balance',
-      details: { user_id: selectedUser.id, new_balance: newBalance }
-    });
-
-    toast({ title: "Success", description: "Balance updated successfully" });
-    setBalanceDialog(false);
-    fetchUsers();
-  };
-
-  const handleUpdateUser = async (updates: any) => {
+  const handleUpdateUserFinancials = async () => {
     if (!selectedUser) return;
+
+    const updates: any = {};
+    if (newBalance !== "") updates.balance = Number(newBalance);
+    if (newProfit !== "") updates.profit = Number(newProfit);
+    if (newBonus !== "") updates.bonus = Number(newBonus);
+
+    if (Object.keys(updates).length === 0) return;
 
     const { error } = await supabase
       .from('profiles')
@@ -76,10 +58,19 @@ export default function AdminUsers() {
       return;
     }
 
-    toast({ title: "Success", description: "User updated successfully" });
+    // Log action
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('admin_logs').insert({
+      admin_id: user?.id,
+      action: 'update_user_financials',
+      details: { user_id: selectedUser.id, updates }
+    });
+
+    toast({ title: "Success", description: "User financials updated successfully" });
     setEditDialog(false);
     fetchUsers();
   };
+
 
   return (
     <div className="space-y-6">
@@ -126,11 +117,18 @@ export default function AdminUsers() {
                   <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => { setSelectedUser(user); setEditDialog(true); }}>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        onClick={() => { 
+                          setSelectedUser(user); 
+                          setNewBalance(user.balance?.toString() || "");
+                          setNewProfit(user.profit?.toString() || "");
+                          setNewBonus(user.bonus?.toString() || "");
+                          setEditDialog(true); 
+                        }}
+                      >
                         <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => { setSelectedUser(user); setNewBalance(user.balance); setBalanceDialog(true); }}>
-                        <DollarSign className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -141,22 +139,40 @@ export default function AdminUsers() {
         </CardContent>
       </Card>
 
-      <Dialog open={balanceDialog} onOpenChange={setBalanceDialog}>
+      <Dialog open={editDialog} onOpenChange={setEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Update Balance</DialogTitle>
+            <DialogTitle>Edit User Financials</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>New Balance</Label>
+              <Label>Balance</Label>
               <Input
                 type="number"
                 value={newBalance}
                 onChange={(e) => setNewBalance(e.target.value)}
-                placeholder="Enter new balance"
+                placeholder="Enter balance"
               />
             </div>
-            <Button onClick={handleUpdateBalance} className="w-full">Update Balance</Button>
+            <div>
+              <Label>Profit</Label>
+              <Input
+                type="number"
+                value={newProfit}
+                onChange={(e) => setNewProfit(e.target.value)}
+                placeholder="Enter profit"
+              />
+            </div>
+            <div>
+              <Label>Bonus</Label>
+              <Input
+                type="number"
+                value={newBonus}
+                onChange={(e) => setNewBonus(e.target.value)}
+                placeholder="Enter bonus"
+              />
+            </div>
+            <Button onClick={handleUpdateUserFinancials} className="w-full">Update User</Button>
           </div>
         </DialogContent>
       </Dialog>
