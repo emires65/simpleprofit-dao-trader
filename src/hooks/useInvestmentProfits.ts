@@ -103,11 +103,8 @@ export const useInvestmentProfits = () => {
           dailyProfitData: dailyData,
         });
 
-        // Update profile profit in database
-        await supabase
-          .from("profiles")
-          .update({ profit: currentProfit })
-          .eq("id", user.id);
+        // Do not persist profit here to avoid overriding admin edits
+        // The dashboard reads profile.profit directly (admin can update it).
       }
     } catch (error) {
       console.error("Error fetching investments:", error);

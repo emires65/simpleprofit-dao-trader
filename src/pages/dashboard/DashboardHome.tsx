@@ -79,7 +79,7 @@ export const DashboardHome = ({ profile }: DashboardHomeProps) => {
     <div className="space-y-6">
       <BalanceOverview
         balance={profile.balance}
-        profit={stats.currentProfit}
+        profit={profile.profit}
         bonus={profile.bonus}
         refBonus={profile.ref_bonus}
         activeInvestments={stats.activeInvestments}
