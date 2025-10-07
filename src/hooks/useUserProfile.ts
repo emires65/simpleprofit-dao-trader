@@ -23,7 +23,7 @@ export const useUserProfile = () => {
         .from("profiles")
         .select("*")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setProfile(data);
@@ -35,7 +35,40 @@ export const useUserProfile = () => {
   };
 
   useEffect(() => {
-    fetchProfile();
+    let channel: any;
+    const setup = async () => {
+      await fetchProfile();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      channel = supabase
+        .channel('profiles-realtime')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${user.id}`,
+          },
+          (payload: any) => {
+            if (payload?.new) {
+              setProfile(payload.new as any);
+            } else if (payload?.eventType === 'DELETE') {
+              setProfile(null);
+            }
+          }
+        )
+        .subscribe();
+    };
+
+    setup();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   return { profile, loading, refetch: fetchProfile };
